@@ -179,7 +179,7 @@ read_flag_row = n_cells * [None]
 # Global list for storing which cell has alternate allele support
 alt_allele_flag_row = n_cells * [None]
 
-def process_pileup_row() :
+def process_pileup_row(line) :
     # iterating through mpileup output, each line is a position in reference
     line = line.replace('\n', '')
     row = line.split('\t')
@@ -203,18 +203,19 @@ def process_pileup_row() :
 
     # No reads supporting alternate allele, so no operations needed
     if (total_ref_depth == total_depth):
-        continue
+       return 
 
     # Cases that are to be prefiltered
     elif ((total_depth > 30) & ((Alt_count <= 2) | (Alt_freq <= 0.001))):
-        continue
+        return
 
     # Bad reference, so filtered
     elif (refBase not in ['A', 'T', 'G', 'C']):
-        continue
+        return
 
     elif (total_depth <= 10):
-        continue
+        return
+
 
 #	elif ((total_depth > 1000) & (Alt_freq <= 0.003)):
 #		continue
@@ -268,7 +269,7 @@ def process_pileup_row() :
             altBase = ''
 
         if (altBase == ''):
-            continue
+            return
 
         # Calculate prior_allele_mat
         prior_allele_mat = U.Get_prior_allele_mat(
@@ -285,7 +286,7 @@ def process_pileup_row() :
         prior_variant_number = prior_variant_dict[read_supported_n_cells]
 
         if (read_supported_n_cells == 0):
-            continue
+            return
 
         # Obtain the value of probability of SNV
         Calc_var_prob_obj = Calc_Var_Prob(
@@ -358,4 +359,4 @@ def process_pileup_row() :
                 vcf_record.get_passcode(barcode)
                 vcf.print_my_record(vcf_record)
 for line in sys.stdin:
-    process_pileup_row()
+    process_pileup_row(line)
