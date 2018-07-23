@@ -104,6 +104,7 @@ class Utils_Functions:
     def Create_Factorial_List(self, max_allele_cnt):
         factorial_list = max_allele_cnt * [None]
         f = math.factorial
+        # If ~250 cells, possible overflow?
         for i in range(max_allele_cnt):
             factorial_list[i] = f(i)
         return factorial_list

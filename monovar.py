@@ -154,7 +154,7 @@ theta = 0.001  # Heterozygosity rate
 Base_dict = {0: 'A', 1: 'T', 2: 'G', 3: 'C'}
 
 # Factorial values and nCr values
-# Table for all the required factorials
+# Table for all the required factorials from utils.py
 factorial_list = U.Create_Factorial_List(max_allele_cnt)
 # Table for all the required nCr
 nCr_matrix = U.Create_nCr_mat(max_allele_cnt, factorial_list)
@@ -162,6 +162,7 @@ nCr_matrix = U.Create_nCr_mat(max_allele_cnt, factorial_list)
 # Dictionary for holding all the priors for different values of n
 prior_variant_dict = {}
 for i in range(n_cells + 1):
+    # in utilities
     prior_variant_dict[i] = U.calc_prior(theta, i, 1)
 
 # Open VCF file and print header
@@ -178,7 +179,8 @@ read_flag_row = n_cells * [None]
 # Global list for storing which cell has alternate allele support
 alt_allele_flag_row = n_cells * [None]
 
-for line in sys.stdin:
+def process_pileup_row() :
+    # iterating through mpileup output, each line is a position in reference
     line = line.replace('\n', '')
     row = line.split('\t')
     contig = row[0]
@@ -355,3 +357,5 @@ for line in sys.stdin:
                 vcf_record.format_vcf(info_list)
                 vcf_record.get_passcode(barcode)
                 vcf.print_my_record(vcf_record)
+for line in sys.stdin:
+    process_pileup_row()
