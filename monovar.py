@@ -327,7 +327,7 @@ def process_pileup_row(line) :
                     read_supported_cell_list, refBase, altBase)
             else:
                 baseQranksum = 0.0
-            genotype_dict = {0: '0/0', 1: '0/1', 2: '1/1'}
+            genotype_dict = {0: '0/0', 1: '0/1', 2: '1/1'} 
             barcode = '<'
             func = partial(M.get_info_string, read_supported_cell_list, prior_allele_mat,
                            n_cells, nCr_matrix, prior_variant_number, denominator, genotype_dict)

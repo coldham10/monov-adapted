@@ -309,6 +309,9 @@ class Utils_Functions:
   #       	return (refRatio, altRatio, oddsRatio)
 
     def calc_prior(self, theta, n_cells, flag):
+        #theta is a hardcoded heterozygosity rate of 0.001
+        # flag hardcoded at 1
+        # n_cells can take on any value from 1 to the number of cells (for DP subproblems(?))
         prior_variant_number = []
         if flag == 1:
             for i in range(0, 2 * n_cells + 1):
