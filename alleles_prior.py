@@ -30,13 +30,6 @@ SOFTWARE.
 
 class allele_prior:
     # refers to amplification errors (?). If so I have modified from the paper as:
-    """ prior_matrix[('RS', 'Q')] represents the probability of Q being the ‘intermediate allele’ given 
-    the genotype g = RS. Q is a variable that takes value from {A,T,G,C}. The term ‘intermediate allele’
-    refers to the allele which is called after amplification. In the absence of any amplification errors,
-    Q should be either R or S. Due to the errors introduced during preparation of the sample, Q can
-    differ from both R and S. In the context of single cell sequencing data, Q accounts for the FP errors
-    introduced during the amplification process"""
-
     def __init__(self, p):
         self.prior_matrix = {}
         self.prior_matrix[('AA', 'T')] = p

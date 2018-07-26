@@ -341,7 +341,9 @@ def process_pileup_row(line) :
             output = pool.map(func, range(read_supported_n_cells))
             read_supported_info_list = [p[0] for p in output]
             read_supported_barcodes = [p[1] for p in output]
-            read_supported_genotype_probs = [':'.join(p[2]) for p in output]
+            rsgp = [p[2] for p in output]
+            read_supported_genotype_probs = [':'.join(['%f' % pr for pr in l]) for l in rsgp]
+
             for j in range(n_cells):
                 if (All_single_cell_ftrs_list[j].depth == 0):
                     info_list.append('./.')
