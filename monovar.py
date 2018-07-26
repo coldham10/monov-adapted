@@ -173,6 +173,11 @@ vcf = VCFDocument(f_vcf)
 vcf.populate_fields(bam_id_list)
 vcf.populate_reference(ref_file)
 vcf.print_header()
+f_geno = open("genotypes", 'w')
+geno_header = "CHROM\tPOS\t"
+geno_header += '\t'.join(bam_id_list)
+geno_header += '\n'
+f_geno.write(geno_header)
 
 # List of all single_cell_ftr_pos object
 All_single_cell_ftrs_list = n_cells * [None]
@@ -386,5 +391,10 @@ def process_pileup_row(line) :
                 vcf_record.get_passcode(barcode)
                 vcf.print_my_record(vcf_record)
 
+
+            geno_probs += '\n'
+            f_geno.write(geno_probs)
 for line in sys.stdin:
     process_pileup_row(line)
+
+f_geno.close()
