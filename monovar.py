@@ -329,20 +329,27 @@ def process_pileup_row(line) :
                 baseQranksum = 0.0
             genotype_dict = {0: '0/0', 1: '0/1', 2: '1/1'} 
             barcode = '<'
+            geno_probs = ''
+
             func = partial(M.get_info_string, read_supported_cell_list, prior_allele_mat,
                            n_cells, nCr_matrix, prior_variant_number, denominator, genotype_dict)
             output = pool.map(func, range(read_supported_n_cells))
             read_supported_info_list = [p[0] for p in output]
             read_supported_barcodes = [p[1] for p in output]
+            read_supported_genotype_probs = [':'.join(p[2]) for p in output]
             for j in range(n_cells):
                 if (All_single_cell_ftrs_list[j].depth == 0):
                     info_list.append('./.')
                     barcode += 'X'
+                    geno_probs += '.:.:.\t'
                 else:
                     info_list.append(read_supported_info_list[0])
                     del read_supported_info_list[0]
                     barcode += read_supported_barcodes[0]
                     del read_supported_barcodes[0]
+                    geno_probs += read_supported_genotype_probs[0]
+                    geno_probs += '\t'
+                    del read_supported_genotype_probs[0]
             barcode += '>'
             if zero_variant_prob == 0:
                 Qual = 323

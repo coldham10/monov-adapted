@@ -110,7 +110,7 @@ class MP_single_cell_genotype:
         cell_info_list = [final_genotype, ','.join([str(current_cell_ftr_info.refDepth), str(
             current_cell_ftr_info.altcount)]), str(current_cell_ftr_info.depth), str(GQ), ','.join([str(i) for i in PL])]
         cell_info_string = ':'.join(cell_info_list)
-        return (cell_info_string, cell_barcode)
+        return (cell_info_string, cell_barcode, norm_p_list)
 
     def pre_compute_likelihood(self, refBase, altBase, Alt_freq, prior_allele_mat, max_depth, sngle_cell_obj):
 
