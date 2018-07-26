@@ -140,6 +140,8 @@ for filename in f_bam_list:
     filename = filename.replace('\n', '')
     bam_id = U.Get_BAM_RG(filename)
     bam_id_list.append(bam_id)
+    """In each single cell, the sequencing data at a site contains an array of bases observed
+    on the sequenced reads and the corresponding base qualities"""
 
 n_cells = len(bam_id_list)
 
@@ -175,6 +177,7 @@ vcf.print_header()
 # List of all single_cell_ftr_pos object
 All_single_cell_ftrs_list = n_cells * [None]
 # Global list for storing which cell contains read support
+# NB a cell has 'read support' at a locus if it has at least one read at that locus
 read_flag_row = n_cells * [None]
 # Global list for storing which cell has alternate allele support
 alt_allele_flag_row = n_cells * [None]
@@ -183,12 +186,25 @@ def process_pileup_row(line) :
     # iterating through mpileup output, each line is a position in reference
     line = line.replace('\n', '')
     row = line.split('\t')
+
+    """ Sequence (chrom) identifier """
     contig = row[0]
+
+    """ Position in sequence (starting from 1) """
     pos = int(row[1])
+
+    """ Reference nucleotide at that position """
     refBase = U.refineBase(row[2])
+
     total_depth = 0
     total_ref_depth = 0
     for i in range(1, n_cells + 1):
+        # Looking at each cell at this locus
+        # Note that the pileup file has three columns for each input file, all on the same locus row.
+        # Once chrom, pos and ref are established it keeps iterating triplets of columns for each bam/cell:
+        """ Number of aligned reads covering that position (depth of coverage)
+        Bases at that position from aligned reads
+        quality of those bases (OPTIONAL)"""
         curr_cell_pos_ftrs = Single_Cell_Ftrs_Pos(
             refBase, row[3 * i: 3 * i + 3])
         total_depth += curr_cell_pos_ftrs.depth
@@ -213,6 +229,7 @@ def process_pileup_row(line) :
     elif (refBase not in ['A', 'T', 'G', 'C']):
         return
 
+    # Won't call if less than 10 reads at a locus. Should this be user defined?
     elif (total_depth <= 10):
         return
 
@@ -232,14 +249,16 @@ def process_pileup_row(line) :
         max_depth = 10000
 
         # Traverse through all the sngl_cell_ftr_obj and if has read support
-        # further calculate the other quantities
+        # further calculate the other quantities (Single_Cell_Ftrs_Pos ?)
         c = 1
         for j in range(n_cells):
+
             sngl_cell_ftr_obj = All_single_cell_ftrs_list[j]
             read_flag = U.checkReadPresence(sngl_cell_ftr_obj)
             if read_flag == 1:
+                # this cell has reads at this locus
                 alt_allele_flag = U.CheckAltAllele(sngl_cell_ftr_obj)
-                sngl_cell_ftr_obj.Get_base_call_string_nd_quals(refBase)
+                sngl_cell_ftr_obj.Get_base_call_string_nd_quals(refBase)  # creates obj.final_bases, just the bases as ACGT. no indels
                 sngl_cell_ftr_obj.Get_Alt_Allele_Count()   # Get the alt allele counts
                 sngl_cell_ftr_obj.Set_Cell_Index(
                     c)        # Save the cell index
@@ -261,23 +280,24 @@ def process_pileup_row(line) :
         read_smpl_count = sum(read_flag_row)
         # Number of cells having alternate allele support
         alt_smpl_count = sum(alt_allele_flag_row)
-        Alt_count = max(total_alt_allele_count)    # Update the Alt_count value
+        Alt_count = max(total_alt_allele_count)    # Update the Alt_count value. note total_alt_allele_count is [#A, #T, #G, #C] by #READS (not cells)
         # Get the altBase
         if Alt_count > 0:
-            altBase = Base_dict[total_alt_allele_count.index(Alt_count)]
+            altBase = Base_dict[total_alt_allele_count.index(Alt_count)] #altBase is base with most READS across all cells
         else:
             altBase = ''
 
         if (altBase == ''):
             return
 
-        # Calculate prior_allele_mat
+        # Calculate prior_allele_mat (pe is FP error, smpl_counts are #cells, Alt_freq is based off # .s and ,s vs total reads)
+        # I believe this is the amplification error part
         prior_allele_mat = U.Get_prior_allele_mat(
             read_smpl_count, alt_smpl_count, cell_no_threshold, total_depth, Alt_freq, pe)
 
         # Operations on the single cells with read support
         # Number of cells with read support
-        read_supported_n_cells = len(read_supported_cell_list)
+        read_supported_n_cells = len(read_supported_cell_list) #TODO: how different from read_smpl_count?
         for j in range(read_supported_n_cells):
             read_supported_cell_list[j].Store_Addl_Info(
                 refBase, altBase, Alt_freq, prior_allele_mat)
@@ -358,5 +378,6 @@ def process_pileup_row(line) :
                 vcf_record.format_vcf(info_list)
                 vcf_record.get_passcode(barcode)
                 vcf.print_my_record(vcf_record)
+
 for line in sys.stdin:
     process_pileup_row(line)

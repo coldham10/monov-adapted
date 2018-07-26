@@ -1,29 +1,4 @@
-"""
-The MIT License
-
-Copyright (c) 2015
-The University of Texas MD Anderson Cancer Center
-Hamim Zafar and Ken Chen (kchen3@mdanderson.org)
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+""" The MIT License Copyright (c) 2015 The University of Texas MD Anderson Cancer Center Hamim Zafar and Ken Chen (kchen3@mdanderson.org) Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
@@ -127,6 +102,7 @@ class Utils_Functions:
             return 1
 
     def RefCountString(self, read_base):
+        """Reading pileup bases, counting those identical to reference"""
         forward_ref_c = read_base.count('.')
         reverse_ref_c = read_base.count(',')
         RefCount = forward_ref_c + reverse_ref_c
@@ -192,6 +168,7 @@ class Utils_Functions:
         return (del_ins_rmvd_str, ins_count, del_count, A_cnt, T_cnt, G_cnt, C_cnt, N_cnt)
 
     def Count_Start_and_End(self, s):
+        """ Returns the number of read starts and ends, as well as the bases with these stripped"""
         end_counts = s.count('$')
         ns = s.replace('$', '')
         start_counts = 0
@@ -381,7 +358,9 @@ class Utils_Functions:
         return (max_prob_ratio, max_prob_allele_count)
 
     def Get_prior_allele_mat(self, read_smpl_count, alt_smpl_count, cell_no_threshold, total_depth, Alt_freq, pe):
+        """Returns the amplification error matrix (?)"""
         if ((read_smpl_count > cell_no_threshold - 1) & (alt_smpl_count == 1)):
+            # TODO: why are these hardcoded?
             prior_allele_mat = allele_prior(0.2)
         elif ((read_smpl_count > cell_no_threshold) & (alt_smpl_count == 2) & (total_depth > 30) & (Alt_freq < 0.1)):
             prior_allele_mat = allele_prior(0.1)

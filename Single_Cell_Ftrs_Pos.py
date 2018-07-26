@@ -34,13 +34,16 @@ import copy
 
 U = Utils_Functions()
 
-
+# In the main program, we create this class for each cell at a locus. Cell iteration nested inside loci iteration
 class Single_Cell_Ftrs_Pos:
 
     # Constructor takes the list of info for the current position as input
     # ([contig, loc, ref, depth, primary_bases, base_q])
+    # Seemingly bad documentation. Actually takes:
+    # (refBase, [n_reads, reads, quals])
     def __init__(self, refBase, current_pos_info_list):
         if (int(current_pos_info_list[0]) == 0):
+            # This cell had no reads at this locus
             self.depth = 0
             self.refDepth = 0
         else:
@@ -48,6 +51,7 @@ class Single_Cell_Ftrs_Pos:
             self.depth = int(current_pos_info_list[0])
             self.primary_bases = current_pos_info_list[1]
             self.base_q = current_pos_info_list[2]
+            # in utils.py
             (self.forward_ref_count, self.reverse_ref_count,
              self.refDepth) = U.RefCountString(self.primary_bases)
 
@@ -81,6 +85,7 @@ class Single_Cell_Ftrs_Pos:
     def Get_Base_Calls(self, ref):
         (self.start_read_counts, self.end_read_counts,
          self.start_end_ins_del_rmvd_bases) = U.Count_Start_and_End(self.ins_del_rmvd_bases)
+        # final_bases removes mpileup idiosyncracies and fwd/reverse strand info: Just the bases, no $s, ^s, .s, ,s or lower case acgts.
         self.final_bases = U.Create_base_call_string(
             self.start_end_ins_del_rmvd_bases, ref)
         return 0
